@@ -1,8 +1,9 @@
-import { Link, useNavigate } from "react-router-dom";
-import { FaCreditCard, FaLock } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { FaLock } from "react-icons/fa";
 
 export default function Payment() {
   const navigate = useNavigate();
+
   const booking = JSON.parse(localStorage.getItem("currentBooking"));
 
   if (!booking) {
@@ -13,11 +14,19 @@ export default function Payment() {
   const handlePayment = () => {
     const confirmedBooking = {
       ...booking,
-      status: "confirmed",
+      status: "Confirmed",
       paymentId: "PAY-" + Date.now(),
+      bookedAt: new Date().toISOString(),
     };
 
-    localStorage.setItem("confirmedBooking", JSON.stringify(confirmedBooking));
+    const previous =
+      JSON.parse(localStorage.getItem("bookingHistory")) || [];
+
+    localStorage.setItem(
+      "bookingHistory",
+      JSON.stringify([...previous, confirmedBooking])
+    );
+
     localStorage.removeItem("currentBooking");
 
     navigate("/confirmation");
@@ -30,24 +39,13 @@ export default function Payment() {
       <div className="bg-white shadow rounded-xl p-6 mb-6">
         <p className="font-semibold">{booking.hotel.name}</p>
         <p className="text-sm text-gray-500">
-          ₹{booking.totalPrice}
+          Total: ₹{booking.totalPrice}
         </p>
-      </div>
-
-      <div className="space-y-4">
-        <input
-          placeholder="Card Number"
-          className="w-full border px-4 py-2 rounded"
-        />
-        <div className="grid grid-cols-2 gap-4">
-          <input placeholder="MM / YY" className="border px-4 py-2 rounded" />
-          <input placeholder="CVV" className="border px-4 py-2 rounded" />
-        </div>
       </div>
 
       <button
         onClick={handlePayment}
-        className="w-full mt-6 bg-green-600 text-white py-3 rounded-xl font-semibold"
+        className="w-full bg-green-600 text-white py-3 rounded-xl font-semibold"
       >
         <FaLock className="inline mr-2" />
         Pay Securely

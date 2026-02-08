@@ -13,6 +13,7 @@ import BookNow from "./components/BookNow";
 import Payment from "./pages/Payment";
 import Receipt from "./pages/Receipt";
 import Confirmation from "./pages/Confirmation";
+import BookingHistory from "./pages/BookingHistory";
 export default function App() {
     const { loading, setLoading } = useLoading();
   useEffect(() => {
@@ -109,6 +110,19 @@ export default function App() {
     <>
   <SignedIn>
                 <Receipt />
+              </SignedIn>
+              <SignedOut>
+                <RedirectToSignIn />
+              </SignedOut>
+              </>
+  }
+/>
+<Route
+  path="/history"
+  element={
+    <>
+  <SignedIn>
+                <BookingHistory />
               </SignedIn>
               <SignedOut>
                 <RedirectToSignIn />
