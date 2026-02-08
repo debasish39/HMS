@@ -14,6 +14,8 @@ import Payment from "./pages/Payment";
 import Receipt from "./pages/Receipt";
 import Confirmation from "./pages/Confirmation";
 import BookingHistory from "./pages/BookingHistory";
+import NotFound from "./pages/NotFound";
+
 export default function App() {
     const { loading, setLoading } = useLoading();
   useEffect(() => {
@@ -130,6 +132,8 @@ export default function App() {
               </>
   }
 />
+<Route path="*" element={<NotFound />} />
+
       </Routes>
     </BrowserRouter>
   );
