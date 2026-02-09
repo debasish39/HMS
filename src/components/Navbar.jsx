@@ -34,11 +34,6 @@ export default function Navbar() {
             className="
     text-3xl font-bold text-blue-600 tracking-wide
   "          style={{ fontFamily: "'Great Vibes', cursive" }}
-
-
-
-
-
           >
             Hotel<span className="text-gray-800">Ease</span>
           </Link>

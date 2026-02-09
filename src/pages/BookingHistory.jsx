@@ -97,13 +97,14 @@ export default function BookingHistory() {
             </div>
 
             {/* RECEIPT */}
-            <Link
-              to="/receipt"
-              className="mt-2 inline-flex items-center gap-2 text-blue-600 text-sm font-medium"
-            >
-              <FaReceipt />
-              View Receipt
-            </Link>
+           <Link
+  to={`/receipt/${b.bookingId}`}
+  className="mt-2 inline-flex items-center gap-2 text-blue-600 text-sm font-medium"
+>
+  <FaReceipt />
+  View Receipt
+</Link>
+
           </div>
         ))}
       </div>

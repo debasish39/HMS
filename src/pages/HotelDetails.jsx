@@ -1,5 +1,6 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import hotels from "../services/hotels";
+import { toast } from "sonner";
 
 // Icons
 import {
@@ -12,9 +13,14 @@ import {
 
 export default function HotelDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const hotel = hotels.find((h) => h.id === parseInt(id));
 
+  // ❌ Hotel not found toast
   if (!hotel) {
+    toast.error("Hotel not found");
+
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center text-gray-500 gap-3">
         <FaBed className="text-5xl text-blue-600" />
@@ -25,6 +31,17 @@ export default function HotelDetails() {
       </div>
     );
   }
+
+  // ✅ Book Now handler
+  const handleBookNow = () => {
+    toast.success("Redirecting to booking page", {
+      description: `${hotel.name} · ${hotel.city}`,
+    });
+
+    setTimeout(() => {
+      navigate(`/book/${hotel.id}`);
+    }, 600);
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 sm:py-10">
@@ -90,12 +107,16 @@ export default function HotelDetails() {
             {hotel.price}
           </p>
 
-      <Link
-  to={`/book/${hotel.id}`}
-  className="w-full bg-blue-600 text-white py-3 px-3 rounded-xl text-center font-semibold"
->
-  Book Now
-</Link>
+          <button
+            onClick={handleBookNow}
+            className="
+              w-full bg-blue-600 text-white py-3 px-3
+              rounded-xl text-center font-semibold
+              hover:bg-blue-700 transition
+            "
+          >
+            Book Now
+          </button>
 
           <p className="text-xs text-gray-400 text-center mt-3">
             Free cancellation available

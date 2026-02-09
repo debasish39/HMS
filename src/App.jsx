@@ -15,7 +15,7 @@ import Receipt from "./pages/Receipt";
 import Confirmation from "./pages/Confirmation";
 import BookingHistory from "./pages/BookingHistory";
 import NotFound from "./pages/NotFound";
-
+import { Toaster } from "sonner";
 export default function App() {
     const { loading, setLoading } = useLoading();
   useEffect(() => {
@@ -29,6 +29,9 @@ export default function App() {
   }, [location.pathname]);
 
   return (
+    <>
+          <Toaster richColors position="top-right" />
+
     <BrowserRouter>
           {loading && <Loader />}
 
@@ -107,7 +110,7 @@ export default function App() {
   }
 />
 <Route
-  path="/receipt"
+  path="/receipt/:bookingId"
   element={
     <>
   <SignedIn>
@@ -136,5 +139,6 @@ export default function App() {
 
       </Routes>
     </BrowserRouter>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import hotels from "../services/hotels";
+import { toast } from "sonner";
 
 // Icons
 import {
@@ -22,6 +23,14 @@ export default function BookNow() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
 
+  // ❌ Hotel not found
+  useEffect(() => {
+    if (!hotel) {
+      toast.error("Hotel not found");
+      navigate("/hotels");
+    }
+  }, [hotel, navigate]);
+
   // ---------------- Nights Calculation ----------------
   const nights = useMemo(() => {
     if (!checkIn || !checkOut) return 0;
@@ -40,6 +49,11 @@ export default function BookNow() {
 
   // ---------------- Save Booking ----------------
   const handleConfirmBooking = () => {
+    if (!checkIn || !checkOut || nights <= 0) {
+      toast.warning("Please select valid check-in and check-out dates");
+      return;
+    }
+
     const booking = {
       bookingId: Date.now(),
       hotel,
@@ -49,20 +63,21 @@ export default function BookNow() {
       checkOut,
       nights,
       totalPrice,
-      status: "pending",
+      status: "Pending",
     };
 
     localStorage.setItem("currentBooking", JSON.stringify(booking));
-    navigate(`/payment/${hotel.id}`);
+
+    toast.success("Booking details saved", {
+      description: "Proceeding to payment",
+    });
+
+    setTimeout(() => {
+      navigate(`/payment/${hotel.id}`);
+    }, 600);
   };
 
-  if (!hotel) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center text-gray-500">
-        Booking not found
-      </div>
-    );
-  }
+  if (!hotel) return null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">

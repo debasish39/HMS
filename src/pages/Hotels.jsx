@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import hotelsData from "../services/hotels";
 import HotelCard from "../components/HotelCard";
 import { useSearch } from "../context/SearchContext";
+import { toast } from "sonner";
 
 // Icons
 import {
@@ -24,10 +25,23 @@ export default function Hotels() {
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // 🔄 Trigger loading when filters/search change
+  const firstRender = useRef(true);
+
+  // 🔄 Trigger loading + toast on filter/search change
   useEffect(() => {
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 400);
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+
+      // 🔔 Prevent toast on first load
+      if (!firstRender.current) {
+        toast.info("Filters updated");
+      } else {
+        firstRender.current = false;
+      }
+    }, 400);
+
     return () => clearTimeout(timer);
   }, [query, city, roomType, maxPrice, sortBy]);
 
@@ -52,6 +66,13 @@ export default function Hotels() {
       return 0;
     });
 
+  // 🔔 Toast when no results
+  useEffect(() => {
+    if (!loading && filteredHotels.length === 0 && !firstRender.current) {
+      toast.error("No rooms match your search");
+    }
+  }, [filteredHotels, loading]);
+
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-6 sm:py-10">
       
@@ -69,7 +90,10 @@ export default function Hotels() {
 
         {/* Mobile Filter Button */}
         <button
-          onClick={() => setShowFilters(true)}
+          onClick={() => {
+            setShowFilters(true);
+            toast.message("Open filters");
+          }}
           className="sm:hidden flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg"
         >
           <FaFilter />
@@ -114,7 +138,10 @@ export default function Hotels() {
             />
 
             <button
-              onClick={() => setShowFilters(false)}
+              onClick={() => {
+                setShowFilters(false);
+                toast.success("Filters applied");
+              }}
               className="mt-6 w-full bg-blue-600 text-white py-3 rounded-xl"
             >
               Apply Filters

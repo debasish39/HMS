@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function HotelCard({ hotel }) {
+  const handleViewDetails = () => {
+    toast.info("Opening hotel details", {
+      description: `${hotel.name} · ${hotel.city}`,
+    });
+  };
+
   return (
     <div className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden">
       <img
@@ -22,7 +29,12 @@ export default function HotelCard({ hotel }) {
 
         <Link
           to={`/hotels/${hotel.id}`}
-          className="block mt-4 text-center bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+          onClick={handleViewDetails}
+          className="
+            block mt-4 text-center
+            bg-blue-600 text-white py-2 rounded-lg
+            hover:bg-blue-700 transition
+          "
         >
           View Details
         </Link>
