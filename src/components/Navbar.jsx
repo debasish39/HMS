@@ -1,7 +1,12 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import { useSearch } from "../context/SearchContext";
-import { FaSearch, FaHome, FaHotel, FaClipboardList, FaSignInAlt } from "react-icons/fa";
+import {
+  FaHome,
+  FaHotel,
+  FaClipboardList,
+  FaSignInAlt,
+} from "react-icons/fa";
 import { useEffect, useState } from "react";
 
 export default function Navbar() {
@@ -12,6 +17,7 @@ export default function Navbar() {
   const [showNav, setShowNav] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
+  // ================= SEARCH =================
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setQuery(value);
@@ -21,19 +27,14 @@ export default function Navbar() {
     }
   };
 
-  // ================= SCROLL LOGIC =================
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY && currentScrollY > 50) {
-        // scrolling down
+      if (currentScrollY > lastScrollY && currentScrollY > 60) {
         setShowNav(false);
       } else {
-        // scrolling up
         setShowNav(true);
       }
-
       setLastScrollY(currentScrollY);
     };
 
@@ -41,19 +42,36 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  const isActive = (path) =>
+    location.pathname === path ||
+    location.pathname.startsWith(path + "/");
+
+  const navLinkClass = (active) =>
+    `
+    relative flex items-center gap-2 font-medium transition
+    ${active ? "text-blue-600" : "text-gray-700 hover:text-blue-600"}
+    after:absolute after:-bottom-1 after:left-0 after:h-[2px]
+    after:bg-blue-600 after:rounded-full
+    after:transition-all after:duration-300
+    ${active ? "after:w-full" : "after:w-0 hover:after:w-full"}
+  `;
+
   return (
     <>
-      {/* ================= MOBILE TOP SEARCH ================= */}
       <div
         className={`
           md:hidden sticky top-0 z-50
-          bg-white/90 backdrop-blur border border-b-black/30 px-4 py-3
-          transition-transform duration-300
+          bg-white/80 backdrop-blur border-b
+          px-4 py-3 transition-transform duration-300
           ${showNav ? "translate-y-0" : "-translate-y-full"}
         `}
       >
         <div className="relative">
-          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          <img
+            src="/hms.png"
+            alt="Search"
+            className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 opacity-70"
+          />
           <input
             type="text"
             placeholder="Search hotels, cities, room types..."
@@ -61,26 +79,24 @@ export default function Navbar() {
             onChange={handleSearchChange}
             className="
               w-full pl-12 pr-4 py-2.5 rounded-xl border
+              bg-gray-50 text-sm
               focus:ring-2 focus:ring-blue-500 focus:outline-none
-              text-sm bg-gray-50
             "
           />
         </div>
       </div>
 
-      {/* ================= DESKTOP NAVBAR ================= */}
       <nav
         className={`
           hidden md:block sticky top-0 z-50
           bg-white/80 backdrop-blur-md border-b
-          transition-transform border border-b-black/30 duration-300
+          transition-transform duration-300
           ${showNav ? "translate-y-0" : "-translate-y-full"}
         `}
       >
-        <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="max-w-7xl mx-auto px-6 py-3">
           <div className="flex items-center justify-between gap-6">
 
-            {/* Logo */}
             <Link
               to="/"
               className="text-3xl font-bold text-blue-600 tracking-wide"
@@ -89,9 +105,12 @@ export default function Navbar() {
               Hotel<span className="text-gray-800">Ease</span>
             </Link>
 
-            {/* Desktop Search */}
-            <div className="flex flex-1 max-w-xl relative">
-              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            <div className="relative flex-1 max-w-xl">
+              <img
+                src="/hms.png"
+                alt="Search"
+                className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 opacity-70"
+              />
               <input
                 type="text"
                 placeholder="Search hotels, cities, room types..."
@@ -99,21 +118,22 @@ export default function Navbar() {
                 onChange={handleSearchChange}
                 className="
                   w-full pl-12 pr-4 py-2.5 rounded-full border
+                  bg-gray-50 text-sm
                   focus:ring-2 focus:ring-blue-500 focus:outline-none
-                  text-sm bg-gray-50
                 "
               />
             </div>
 
-            {/* Desktop Menu */}
-            <div className="flex items-center gap-6">
-              <Link to="/" className="flex items-center gap-2 text-gray-700 font-medium">
+            <div className="flex items-center gap-8">
+              <Link to="/" className={navLinkClass(isActive("/"))}>
                 <FaHome /> Home
               </Link>
-              <Link to="/hotels" className="flex items-center gap-2 text-gray-700 font-medium">
+
+              <Link to="/hotels" className={navLinkClass(isActive("/hotels"))}>
                 <FaHotel /> Hotels
               </Link>
-              <Link to="/history" className="flex items-center gap-2 text-gray-700 font-medium">
+
+              <Link to="/history" className={navLinkClass(isActive("/history"))}>
                 <FaClipboardList /> My Bookings
               </Link>
 
@@ -124,7 +144,12 @@ export default function Navbar() {
               <SignedOut>
                 <Link
                   to="/sign-in"
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full text-sm font-medium transition"
+                  className="
+                    flex items-center gap-2
+                    bg-blue-600 text-white px-4 py-2
+                    rounded-full text-sm font-medium
+                    hover:bg-blue-700 transition
+                  "
                 >
                   <FaSignInAlt /> Sign In
                 </Link>
@@ -134,29 +159,28 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* ================= MOBILE BOTTOM NAVBAR ================= */}
       <div
         className={`
           md:hidden fixed bottom-0 left-0 right-0 z-50
-          bg-white border-t
+          bg-white/80 border-t
           transition-transform duration-300
           ${showNav ? "translate-y-0" : "translate-y-full"}
         `}
       >
-        <div className="flex items-center justify-around py-2 text-xs">
-          <Link to="/" className="flex flex-col items-center gap-1 text-gray-700">
+        <div className="flex justify-around py-2 text-xs">
+          <Link to="/" className="flex flex-col items-center gap-1 text-gray-700 hover:text-blue-600 transition">
             <FaHome className="text-lg" />
-            <span>Home</span>
+            Home
           </Link>
 
-          <Link to="/hotels" className="flex flex-col items-center gap-1 text-gray-700">
+          <Link to="/hotels" className="flex flex-col items-center gap-1 text-gray-700 hover:text-blue-600 transition">
             <FaHotel className="text-lg" />
-            <span>Hotels</span>
+            Hotels
           </Link>
 
-          <Link to="/history" className="flex flex-col items-center gap-1 text-gray-700">
+          <Link to="/history" className="flex flex-col items-center gap-1 text-gray-700 hover:text-blue-600 transition">
             <FaClipboardList className="text-lg" />
-            <span>Bookings</span>
+            Bookings
           </Link>
 
           <SignedIn>
@@ -166,7 +190,7 @@ export default function Navbar() {
           <SignedOut>
             <Link to="/sign-in" className="flex flex-col items-center gap-1 text-blue-600">
               <FaSignInAlt className="text-lg" />
-              <span>Sign In</span>
+              Sign In
             </Link>
           </SignedOut>
         </div>

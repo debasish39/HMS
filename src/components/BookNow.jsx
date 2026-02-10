@@ -23,7 +23,6 @@ export default function BookNow() {
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
 
-  // ❌ Hotel not found
   useEffect(() => {
     if (!hotel) {
       toast.error("Hotel not found");

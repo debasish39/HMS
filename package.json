@@ -12,6 +12,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.60.0",
     "@tailwindcss/vite": "^4.1.18",
+    "aos": "^2.3.4",
     "dom-to-image-more": "^3.7.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.1.0",
@@ -21,7 +22,8 @@
     "react-router-dom": "^7.13.0",
     "react-toastify": "^11.0.5",
     "sonner": "^2.0.7",
-    "tailwindcss": "^4.1.18"
+    "tailwindcss": "^4.1.18",
+    "vite-plugin-pwa": "^1.2.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

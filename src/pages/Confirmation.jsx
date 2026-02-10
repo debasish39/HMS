@@ -2,6 +2,7 @@ import { FaCheckCircle, FaHome, FaHistory } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import Footer from "../components/Footer";
 
 export default function Confirmation() {
   const history =
@@ -9,7 +10,6 @@ export default function Confirmation() {
 
   const booking = history[history.length - 1];
 
-  // ❌ No booking found
   useEffect(() => {
     if (!booking) {
       toast.error("No confirmed booking found");
@@ -32,6 +32,7 @@ export default function Confirmation() {
   }
 
   return (
+    <>
     <div className="max-w-xl mx-auto px-4 py-16 text-center">
       
       {/* Icon */}
@@ -75,6 +76,9 @@ export default function Confirmation() {
           Booking History
         </Link>
       </div>
+      
     </div>
+    <Footer/>
+    </>
   );
 }

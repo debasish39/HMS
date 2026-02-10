@@ -16,8 +16,19 @@ import Confirmation from "./pages/Confirmation";
 import BookingHistory from "./pages/BookingHistory";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
+import AOS from "aos";
+import "aos/dist/aos.css";
+import ScrollToTop from "./components/ScrollToTop";
 export default function App() {
-    const { loading, setLoading } = useLoading();
+  const { loading, setLoading } = useLoading();
+  useEffect(() => {
+    AOS.init({
+      duration: 900,
+      easing: 'ease-in-out',
+      once: false,
+      offset: 50,
+    });
+  }, [])
   useEffect(() => {
     setLoading(true);
 
@@ -30,115 +41,117 @@ export default function App() {
 
   return (
     <>
-          <Toaster richColors position="top-right" />
+      <Toaster richColors position="top-right" />
 
-    <BrowserRouter>
-          {loading && <Loader />}
+      <BrowserRouter>
+        {loading && <Loader />}
 
-      <Navbar />
+        <Navbar />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/sign-in" element={<SignInPage />} />
-        <Route path="/sign-up" element={<SignUpPage />} />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/sign-up" element={<SignUpPage />} />
 
-        {/* Protected Routes */}
-        <Route
-          path="/hotels"
-          element={
-            <>
-              <SignedIn>
-                <Hotels />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-            </>
-          }
-        />
-
-        <Route
-          path="/hotels/:id"
-          element={
-            <>
-              <SignedIn>
-                <HotelDetails />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-            </>
-          }
-        />
-        <Route
-  path="/book/:id"
-  element={
-    <>
-  <SignedIn>
-                <BookNow/>
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
+          {/* Protected Routes */}
+          <Route
+            path="/hotels"
+            element={
+              <>
+                <SignedIn>
+                  <Hotels />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
               </>
-  }
-/>
-<Route
-  path="/payment/:id"
-  element={
-    <>
-  <SignedIn>
-                <Payment />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-              </>
-  }
-/>
-<Route
-  path="/confirmation"
-  element={
-    <>
-  <SignedIn>
-               <Confirmation />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-              </>
-  }
-/>
-<Route
-  path="/receipt/:bookingId"
-  element={
-    <>
-  <SignedIn>
-                <Receipt />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-              </>
-  }
-/>
-<Route
-  path="/history"
-  element={
-    <>
-  <SignedIn>
-                <BookingHistory />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-              </>
-  }
-/>
-<Route path="*" element={<NotFound />} />
+            }
+          />
 
-      </Routes>
-    </BrowserRouter>
+          <Route
+            path="/hotels/:id"
+            element={
+              <>
+                <SignedIn>
+                  <HotelDetails />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            }
+          />
+          <Route
+            path="/book/:id"
+            element={
+              <>
+                <SignedIn>
+                  <BookNow />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            }
+          />
+          <Route
+            path="/payment/:id"
+            element={
+              <>
+                <SignedIn>
+                  <Payment />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            }
+          />
+          <Route
+            path="/confirmation"
+            element={
+              <>
+                <SignedIn>
+                  <Confirmation />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            }
+          />
+          <Route
+            path="/receipt/:bookingId"
+            element={
+              <>
+                <SignedIn>
+                  <Receipt />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              <>
+                <SignedIn>
+                  <BookingHistory />
+                </SignedIn>
+                <SignedOut>
+                  <RedirectToSignIn />
+                </SignedOut>
+              </>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+
+        </Routes>
+        <ScrollToTop />
+
+      </BrowserRouter>
     </>
   );
 }
