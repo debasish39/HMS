@@ -18,11 +18,14 @@ export default function BookNow() {
 
   const hotel = hotels.find((h) => h.id === parseInt(id));
 
+  const today = new Date().toISOString().split("T")[0];
+
   const [adults, setAdults] = useState(1);
   const [children, setChildren] = useState(0);
   const [checkIn, setCheckIn] = useState("");
   const [checkOut, setCheckOut] = useState("");
 
+  // Redirect if invalid hotel
   useEffect(() => {
     if (!hotel) {
       toast.error("Hotel not found");
@@ -33,9 +36,11 @@ export default function BookNow() {
   // ---------------- Nights Calculation ----------------
   const nights = useMemo(() => {
     if (!checkIn || !checkOut) return 0;
+
     const start = new Date(checkIn);
     const end = new Date(checkOut);
     const diff = end - start;
+
     return diff > 0 ? diff / (1000 * 60 * 60 * 24) : 0;
   }, [checkIn, checkOut]);
 
@@ -46,12 +51,61 @@ export default function BookNow() {
     return Math.round(hotel.price * nights * guestFactor);
   }, [hotel, nights, adults, children]);
 
+  // ---------------- Validation ----------------
+  const validateForm = () => {
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+
+    if (!checkIn) {
+      toast.error("Please select check-in date");
+      return false;
+    }
+
+    if (!checkOut) {
+      toast.error("Please select check-out date");
+      return false;
+    }
+
+    const checkInDate = new Date(checkIn);
+    const checkOutDate = new Date(checkOut);
+
+    checkInDate.setHours(0, 0, 0, 0);
+    checkOutDate.setHours(0, 0, 0, 0);
+
+    if (checkInDate < todayDate) {
+      toast.error("Check-in date cannot be in the past");
+      return false;
+    }
+
+    if (checkOutDate <= checkInDate) {
+      toast.error("Check-out must be after check-in");
+      return false;
+    }
+
+    const diffDays =
+      (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24);
+
+    if (diffDays > 30) {
+      toast.warning("Maximum stay allowed is 30 days");
+      return false;
+    }
+
+    if (adults < 1) {
+      toast.error("At least 1 adult is required");
+      return false;
+    }
+
+    if (adults + children > 6) {
+      toast.warning("Maximum 6 guests allowed");
+      return false;
+    }
+
+    return true;
+  };
+
   // ---------------- Save Booking ----------------
   const handleConfirmBooking = () => {
-    if (!checkIn || !checkOut || nights <= 0) {
-      toast.warning("Please select valid check-in and check-out dates");
-      return;
-    }
+    if (!validateForm()) return;
 
     const booking = {
       bookingId: Date.now(),
@@ -67,21 +121,21 @@ export default function BookNow() {
 
     localStorage.setItem("currentBooking", JSON.stringify(booking));
 
-    toast.success("Booking details saved", {
-      description: "Proceeding to payment",
+    toast.success("Booking saved", {
+      description: "Redirecting to payment...",
     });
 
     setTimeout(() => {
       navigate(`/payment/${hotel.id}`);
-    }, 600);
+    }, 800);
   };
 
   if (!hotel) return null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      
-      {/* Back */}
+
+      {/* Back Button */}
       <Link
         to={`/hotels/${hotel.id}`}
         className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 mb-6"
@@ -91,8 +145,8 @@ export default function BookNow() {
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* ================= LEFT: FORM ================= */}
+
+        {/* LEFT: FORM */}
         <div className="lg:col-span-2 bg-white shadow-lg rounded-2xl p-6">
           <h2 className="text-2xl font-bold mb-6">
             Book Your Stay
@@ -106,9 +160,10 @@ export default function BookNow() {
               </label>
               <input
                 type="date"
+                min={today}
                 value={checkIn}
                 onChange={(e) => setCheckIn(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -118,9 +173,10 @@ export default function BookNow() {
               </label>
               <input
                 type="date"
+                min={checkIn || today}
                 value={checkOut}
                 onChange={(e) => setCheckOut(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -134,8 +190,11 @@ export default function BookNow() {
               <input
                 type="number"
                 min="1"
+                max="6"
                 value={adults}
-                onChange={(e) => setAdults(Number(e.target.value))}
+                onChange={(e) =>
+                  setAdults(Math.max(1, Number(e.target.value)))
+                }
                 className="w-full border rounded-lg px-3 py-2"
               />
             </div>
@@ -147,28 +206,26 @@ export default function BookNow() {
               <input
                 type="number"
                 min="0"
+                max="5"
                 value={children}
-                onChange={(e) => setChildren(Number(e.target.value))}
+                onChange={(e) =>
+                  setChildren(Math.max(0, Number(e.target.value)))
+                }
                 className="w-full border rounded-lg px-3 py-2"
               />
             </div>
           </div>
 
-          {/* CTA */}
+          {/* Button */}
           <button
             onClick={handleConfirmBooking}
-            disabled={!checkIn || !checkOut || nights <= 0}
-            className="
-              w-full bg-blue-600 text-white py-3 rounded-xl
-              font-semibold hover:bg-blue-700 transition
-              disabled:opacity-50 disabled:cursor-not-allowed
-            "
+            className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
           >
             Proceed to Payment
           </button>
         </div>
 
-        {/* ================= RIGHT: SUMMARY ================= */}
+        {/* RIGHT: SUMMARY */}
         <div className="bg-gray-50 rounded-2xl p-6 shadow-md h-fit">
           <h3 className="text-lg font-semibold mb-4">
             Booking Summary
